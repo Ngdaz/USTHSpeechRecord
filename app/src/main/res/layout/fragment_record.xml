@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RecordFragment"
+    android:orientation="vertical">
+
+    <TextView
+        android:padding="40px"
+        android:id="@+id/get_text"
+        android:layout_width="match_parent"
+        android:layout_height="800px"
+        android:textSize="50px"
+        android:textColor="#000"
+        android:background="@color/background_text"
+        android:scrollbars="vertical"
+        />
+
+    <Spinner
+        android:id="@+id/spnCategory"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="50px"
+        android:layout_marginLeft="30px"
+        android:layout_marginRight="30px"
+        android:background="#BABABA"
+        android:padding="5dip">
+    </Spinner>
+
+    <Button
+        android:layout_marginTop="30px"
+        android:layout_marginBottom="50px"
+        android:id="@+id/btn_get_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get text"
+        android:layout_gravity="center"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btn_retry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RETRY"/>
+
+        <vn.edu.usth.usthspeechrecord.StateButton
+            android:id="@+id/btnStartRecord"
+            android:layout_width="100dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:background="#49BCFF"
+            android:text="Record"/>
+
+        <vn.edu.usth.usthspeechrecord.MediaPlayButton
+            android:id="@+id/btnPlayRecord"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Play"
+            android:layout_gravity="center"/>
+    </LinearLayout>
+</LinearLayout>

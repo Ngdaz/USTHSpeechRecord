@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">USTHSpeechRecord</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="user_name">speech@usth.edu.vn</string>
+    <string name="password">c950f8a82221d74a357af014434de14cb9dc11850b8ecc2a356dd4c945df2518</string>
+
+    <string name="title_record">Record</string>
+    <string name="title_vote">Vote</string>
+    <string name="title_edit">Edit</string>
+</resources>
