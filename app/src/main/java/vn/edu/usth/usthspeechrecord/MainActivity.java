@@ -6,18 +6,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewParent;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -29,7 +36,10 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +48,15 @@ public class MainActivity extends AppCompatActivity {
     public String mToken = "";
     RequestQueue mQueue;
 
+    TabLayout mTabLayout;
+    ViewPager viewPager;
+
+    private int[] tabIcons = {
+            R.drawable.ic_mic_black_24dp,
+            R.drawable.ic_thumbs_up_down_black_24dp,
+            R.drawable.ic_mode_edit_black_24dp
+    };
+
     BottomNavigationView navigation;
 
     @Override
@@ -45,46 +64,99 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        IntentFilter filter = new IntentFilter("TOKEN");
-
-
+        mTabLayout = findViewById(R.id.btm_nav_bar);
+        viewPager = findViewById(R.id.container);
         mQueue = VolleySingleton.getInstance(getApplicationContext()).getRequestQueue();
+
+        getSupportActionBar().setTitle("Record");
 
         if (!checkPermissionFromDevice()) {
             requestPermission();
         }
 
+        deleteFolder();
         Login();
-
-
-        navigation = findViewById(R.id.btm_nav_bar);
-        getSupportFragmentManager().beginTransaction().add(R.id.container, RecordFragment.newInstance(mToken)).commit();
-        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                Fragment newFragment;
-                switch (menuItem.getItemId()) {
-                    case R.id.navigation_record:
-                        newFragment = RecordFragment.newInstance(mToken);
-                        break;
-                    case R.id.navigation_vote:
-                        newFragment = new VoteFragment();
-                        break;
-                    case R.id.navigation_edit:
-                        newFragment = new EditFragment();
-                    default:
-                        newFragment = new Fragment();
-                }
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, newFragment).commit();
-                return true;
-            }
-        });
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
+    }
+
+    private void setupViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(RecordFragment.newInstance(mToken), "Record");
+        adapter.addFragment(VoteFragment.newInstance(mToken), "Vote");
+        adapter.addFragment(EditFragment.newInstance(mToken), "Edit");
+        viewPager.setAdapter(adapter);
+        viewPager.setOffscreenPageLimit(3);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0:
+                        getSupportActionBar().setTitle("Record");
+                        break;
+                    case 1:
+                        getSupportActionBar().setTitle("Vote");
+                        break;
+                    case 2:
+                        getSupportActionBar().setTitle("Edit");
+                        break;
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+
+    }
+    private void setupTabIcons() {
+        if (mTabLayout!=null){
+            if (mTabLayout.getTabAt(0)!=null)
+                mTabLayout.getTabAt(0).setIcon(tabIcons[0]);
+            if (mTabLayout.getTabAt(1)!=null)
+                mTabLayout.getTabAt(1).setIcon(tabIcons[1]);
+            if (mTabLayout.getTabAt(2)!=null)
+                mTabLayout.getTabAt(2).setIcon(tabIcons[2]);
+        }
+    }
+
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
+
     }
 
     public boolean checkPermissionFromDevice() {
@@ -124,6 +196,9 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = response.getJSONObject("resp");
                     mToken = jsonObject.getString("token");
+                    setupViewPager(viewPager);
+                    mTabLayout.setupWithViewPager(viewPager);
+                    setupTabIcons();
                     Log.d("RESP", mToken);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -146,4 +221,11 @@ public class MainActivity extends AppCompatActivity {
         mQueue.add(request);
     }
 
+    private void deleteFolder() {
+        String filepath = Environment.getExternalStorageDirectory().getPath();
+        File file = new File(filepath,"VoiceDownload");
+        file.delete();
+        file = new File(filepath,"Audio");
+        file.delete();
+    }
 }

@@ -4,27 +4,44 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".RecordFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#ebebeb">
 
-    <TextView
-        android:padding="40px"
-        android:id="@+id/get_text"
+    <FrameLayout
+        android:id="@+id/record_text_container"
         android:layout_width="match_parent"
-        android:layout_height="800px"
-        android:textSize="50px"
-        android:textColor="#000"
-        android:background="@color/background_text"
-        android:scrollbars="vertical"
-        />
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/get_text"
+            android:layout_width="match_parent"
+            android:layout_height="800px"
+            android:background="#f3f3f3"
+            android:gravity="center"
+            android:padding="40px"
+            android:scrollbars="vertical"
+            android:textColor="#000"
+            android:textSize="50px" />
+
+        <ProgressBar
+            android:id="@+id/record_progress_bar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+
 
     <Spinner
         android:id="@+id/spnCategory"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="50px"
         android:layout_marginLeft="30px"
         android:layout_marginRight="30px"
-        android:background="#BABABA"
+        android:background="#f3f3f3"
+        android:layout_gravity="center"
+        android:gravity="center"
         android:padding="5dip">
     </Spinner>
 
@@ -41,28 +58,29 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         android:gravity="center">
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_retry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="RETRY"/>
+            android:background="@drawable/play_retry_bg"
+            android:layout_marginRight="25dp"
+            android:src="@drawable/ic_retry"/>
 
         <vn.edu.usth.usthspeechrecord.StateButton
             android:id="@+id/btnStartRecord"
-            android:layout_width="100dp"
-            android:layout_height="70dp"
-            android:layout_gravity="center"
-            android:background="#49BCFF"
-            android:text="Record"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/recordshape"
+            android:src="@drawable/ic_mic_black"/>
 
         <vn.edu.usth.usthspeechrecord.MediaPlayButton
             android:id="@+id/btnPlayRecord"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Play"
-            android:layout_gravity="center"/>
+            android:layout_marginLeft="25dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/play_retry_bg"
+            android:src="@drawable/ic_play" />
     </LinearLayout>
 </LinearLayout>

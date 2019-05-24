@@ -1,14 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".EditFragment">
+    tools:context=".EditFragment"
+    android:background="#ebebeb">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <FrameLayout
+        android:id="@+id/text_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Edit Fragment" />
+        android:layout_height="wrap_content">
 
-</FrameLayout>
+        <EditText
+            android:id="@+id/text_editor"
+            android:layout_width="match_parent"
+            android:layout_height="900px"
+            android:background="#f3f3f3"
+            android:gravity="center"
+            android:padding="40px"
+            android:scrollbars="vertical"
+            android:textColor="#000"
+            android:textSize="50px" />
+
+        <ProgressBar
+            android:id="@+id/edit_circle_bar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+    </FrameLayout>
+
+
+    <vn.edu.usth.usthspeechrecord.MediaButton
+        android:id="@+id/mediaButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_container"
+        android:layout_marginTop="95dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/shapedrawable"
+        android:src="@drawable/ic_play_arrow_black_24dp" />
+
+    <ImageButton
+        android:id="@+id/btn_done"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/mediaButton"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/shapevotebtn"
+        android:layout_toStartOf="@+id/mediaButton"
+        android:src="@drawable/ic_done_black_24dp" />
+
+    <ImageButton
+        android:id="@+id/btn_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/mediaButton"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/play_retry_bg"
+        android:layout_toEndOf="@+id/mediaButton"
+        android:src="@drawable/ic_navigate_next_black_24dp" />
+
+
+
+</RelativeLayout>

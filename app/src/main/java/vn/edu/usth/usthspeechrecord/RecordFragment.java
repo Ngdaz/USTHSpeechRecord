@@ -1,12 +1,17 @@
 package vn.edu.usth.usthspeechrecord;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -15,6 +20,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -31,31 +38,45 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 
 
 public class RecordFragment extends Fragment {
     private static final String main_url = "https://voiceviet.itrithuc.vn/api/v1";
 
     RequestQueue mQueue;
-    Button btnPlay, btnGetText, btnRetry;
+    Button btnGetText;
+    ImageButton btnRetry;
     StateButton btnStartRecord;
+    MediaPlayButton btnPlay;
     Spinner listCategories;
     TextView mTextView;
+    String pathSave = "";
+    ProgressBar circleBar;
 
     MediaPlayer mMediaPlayer;
-    public String mText = "";
-    public String mId = "";
-    public String mToken = "";
-    public int mCatId = 0;
-    public ArrayList<Category> mCategories = new ArrayList<Category>();
+    String mText = "";
+    String mId = "";
+    String mToken = "";
+    int mCatId = 0;
+    ArrayList<Category> mCategories = new ArrayList<Category>();
     CategoryAdapter categoryAdapter;
 
     private static final int RECORDER_BPP = 16;
     private static final String AUDIO_RECORDER_FILE_EXT_WAV = "_audio_record.wav";
-    private static final String AUDIO_RECORDER_FOLDER = "AudioRecorder";
+    private static final String AUDIO_RECORDER_FOLDER = "Audio";
     private static final String AUDIO_RECORDER_TEMP_FILE = "record_temp.raw";
     private static final int RECORDER_SAMPLERATE = 44100;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
@@ -65,6 +86,7 @@ public class RecordFragment extends Fragment {
     private int bufferSize = 0;
     private Thread recordingThread = null;
     private boolean isRecording = false;
+
 
     public RecordFragment() {
     }
@@ -81,13 +103,19 @@ public class RecordFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mQueue = VolleySingleton.getInstance(getActivity().getApplicationContext()).getRequestQueue();
-        mToken = getArguments().getString("TOKEN");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_record, container, false);
+
+        mToken = getArguments().getString("TOKEN");
+        Log.d("RESP2", mToken);
+
+        bufferSize = AudioRecord.getMinBufferSize(8000,
+                AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                AudioFormat.ENCODING_PCM_16BIT);
 
         listCategories = view.findViewById(R.id.spnCategory);
         Category init = new Category("Please choose one category", 0);
@@ -106,6 +134,12 @@ public class RecordFragment extends Fragment {
                     mCatId = mCategories.get(position).getCatNum();
                 } else {
                     btnGetText.setEnabled(false);
+                    btnStartRecord.setEnabled(false);
+                    btnStartRecord.setBackgroundResource(R.drawable.record_shape_disable);
+                    btnPlay.setEnabled(false);
+                    btnPlay.setBackgroundResource(R.drawable.play_retry_disable);
+                    btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
+                    btnRetry.setEnabled(false);
                 }
             }
 
@@ -115,8 +149,6 @@ public class RecordFragment extends Fragment {
             }
         });
 
-
-
         mTextView = view.findViewById(R.id.get_text);
         mTextView.setMovementMethod(new ScrollingMovementMethod());
 
@@ -124,25 +156,313 @@ public class RecordFragment extends Fragment {
         btnStartRecord = view.findViewById(R.id.btnStartRecord);
         btnPlay = view.findViewById(R.id.btnPlayRecord);
         btnRetry = view.findViewById(R.id.btn_retry);
+        circleBar = view.findViewById(R.id.record_progress_bar);
+        circleBar.setVisibility(View.INVISIBLE);
+
+        disableButton();
 
         btnGetText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 jsonParse();
+                btnStartRecord.setEnabled(true);
+                btnStartRecord.setBackgroundResource(R.drawable.recordshape);
             }
         });
 
+        btnStartRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (btnStartRecord.getState()) {
+                    case 0:
+                        pathSave = getFilename();
+                        startRecording();
+                        Toast.makeText(getActivity().getApplicationContext(), "Recording...", Toast.LENGTH_SHORT).show();
+                        btnStartRecord.setImageResource(R.drawable.ic_mic_off_black_24dp);
 
-        mTextView.setText(mToken);
-        Log.d("RESP2", mToken);
-        Toast.makeText(getActivity().getApplicationContext(), mToken, Toast.LENGTH_SHORT).show();
+                        btnRetry.setEnabled(false);
+                        btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
+                        break;
+                    case 1:
+                        stopRecording();
+                        Toast.makeText(getActivity().getApplicationContext(), "Stop recording", Toast.LENGTH_SHORT).show();
+                        btnStartRecord.setImageResource(R.drawable.ic_file_upload_black_24dp);
+                        btnGetText.setEnabled(false);
+
+                        btnPlay.setEnabled(true);
+                        btnPlay.setBackgroundResource(R.drawable.play_retry_bg);
+
+                        btnRetry.setEnabled(true);
+                        btnRetry.setBackgroundResource(R.drawable.play_retry_bg);
+                        break;
+                    case 2:
+                        uploadVoice(pathSave);
+                        btnStartRecord.setImageResource(R.drawable.ic_mic_black);
+
+                        btnRetry.setEnabled(false);
+                        btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
+
+                        btnPlay.setEnabled(false);
+                        btnPlay.setBackgroundResource(R.drawable.play_retry_disable);
+                        break;
+                }
+                btnStartRecord.changeState();
+            }
+        });
+
+        btnPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MediaPlayButton mbp = (MediaPlayButton) v;
+                switch (mbp.getState()) {
+                    case 0:
+                        mMediaPlayer = new MediaPlayer();
+                        try {
+                            Log.d("path", pathSave);
+                            mMediaPlayer.setDataSource(pathSave);
+                            mMediaPlayer.prepare();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        mMediaPlayer.start();
+                        Toast.makeText(getActivity().getApplicationContext(), "Playing...", Toast.LENGTH_SHORT).show();
+
+                        btnStartRecord.setEnabled(false);
+                        btnStartRecord.setBackgroundResource(R.drawable.record_shape_disable);
+
+                        btnRetry.setEnabled(false);
+                        btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
+
+                        btnGetText.setEnabled(false);
+
+                        btnPlay.setImageResource(R.drawable.ic_pause);
+                        break;
+                    case 1:
+                        if (mMediaPlayer != null) {
+                            mMediaPlayer.stop();
+                            mMediaPlayer.release();
+                        }
+                        btnPlay.setImageResource(R.drawable.ic_play);
+
+                        btnStartRecord.setEnabled(true);
+                        btnStartRecord.setBackgroundResource(R.drawable.recordshape);
+
+                        btnGetText.setEnabled(true);
+
+                        btnRetry.setEnabled(true);
+                        btnRetry.setBackgroundResource(R.drawable.play_retry_bg);
+                        break;
+                }
+                mbp.changeState();
+            }
+        });
+
+        btnRetry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnStartRecord.changeState();
+                btnStartRecord.setImageResource(R.drawable.ic_mic_black);
+                btnStartRecord.setBackgroundResource(R.drawable.recordshape);
+                btnRetry.setEnabled(false);
+                btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
+                btnPlay.setEnabled(false);
+                btnPlay.setBackgroundResource(R.drawable.play_retry_disable);
+            }
+        });
 
         return view;
     }
 
+    private String getFilename(){
+        String filepath = Environment.getExternalStorageDirectory().getPath();
+        File file = new File(filepath,AUDIO_RECORDER_FOLDER);
+
+        if(!file.exists()) {
+            file.mkdirs();
+        }
+        return (file.getAbsolutePath() + "/" + mId + AUDIO_RECORDER_FILE_EXT_WAV);
+    }
+
+    private String getTempFilename() {
+        String filepath = Environment.getExternalStorageDirectory().getPath();
+        File file = new File(filepath,AUDIO_RECORDER_FOLDER);
+
+        if (!file.exists()) {
+            file.mkdir();
+        }
+
+        File tempFile = new File(filepath, AUDIO_RECORDER_TEMP_FILE);
+
+        if(tempFile.exists())
+            tempFile.delete();
+        return (file.getAbsolutePath() + "/" + AUDIO_RECORDER_TEMP_FILE);
+    }
+
+    private void startRecording() {
+        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
+                RECORDER_SAMPLERATE, RECORDER_CHANNELS,RECORDER_AUDIO_ENCODING, bufferSize);
+        int i = recorder.getState();
+        if (i==1)
+            recorder.startRecording();
+        isRecording = true;
+        recordingThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                writeAudioDataToFile();
+            }
+        }, "AudioRecord Thread");
+        recordingThread.start();
+    }
+
+    private void writeAudioDataToFile() {
+        byte data[] = new byte[bufferSize];
+        String filename = getTempFilename();
+        FileOutputStream os = null;
+
+        try {
+            os = new FileOutputStream(filename);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        int read = 0;
+
+        if (null != os) {
+            while (isRecording) {
+                read = recorder.read(data, 0, bufferSize);
+
+                if (AudioRecord.ERROR_INVALID_OPERATION != read) {
+                    try {
+                        os.write(data);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            try {
+                os.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void stopRecording() {
+        if (null != recorder) {
+            isRecording = false;
+
+            int i = recorder.getState();
+            if (i==1)
+                recorder.stop();
+            recorder.release();
+
+            recorder = null;
+            recordingThread = null;
+        }
+
+        copyWaveFile(getTempFilename(), getFilename());
+        deleteTempFile();
+    }
+
+    private void deleteTempFile() {
+        File file = new File(getTempFilename());
+        file.delete();
+    }
+
+    private void copyWaveFile(String inFilename, String outFilename) {
+        FileInputStream in = null;
+        FileOutputStream out = null;
+        long totalAudioLen = 0;
+        long totalDataLen = totalAudioLen + 36;
+        long longSampleRate = RECORDER_SAMPLERATE;
+        int channels = 2;
+        long byteRate = RECORDER_BPP * RECORDER_SAMPLERATE * channels/8;
+
+        byte[] data = new byte[bufferSize];
+
+        try {
+            in = new FileInputStream(inFilename);
+            out = new FileOutputStream(outFilename);
+            totalAudioLen = in.getChannel().size();
+            totalDataLen = totalAudioLen + 36;
+
+            Log.d("File size: ", ""+ totalDataLen);
+
+            WriteWaveFileHeader(out, totalAudioLen, totalDataLen,
+                    longSampleRate, channels, byteRate);
+
+            while(in.read(data) != -1){
+                out.write(data);
+            }
+
+            in.close();
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void WriteWaveFileHeader(
+            FileOutputStream out, long totalAudioLen,
+            long totalDataLen, long longSampleRate, int channels,
+            long byteRate) throws IOException {
+        byte[] header = new byte[44];
+
+        header[0] = 'R'; // RIFF/WAVE header
+        header[1] = 'I';
+        header[2] = 'F';
+        header[3] = 'F';
+        header[4] = (byte) (totalDataLen & 0xff);
+        header[5] = (byte) ((totalDataLen >> 8) & 0xff);
+        header[6] = (byte) ((totalDataLen >> 16) & 0xff);
+        header[7] = (byte) ((totalDataLen >> 24) & 0xff);
+        header[8] = 'W';
+        header[9] = 'A';
+        header[10] = 'V';
+        header[11] = 'E';
+        header[12] = 'f'; // 'fmt ' chunk
+        header[13] = 'm';
+        header[14] = 't';
+        header[15] = ' ';
+        header[16] = 16; // 4 bytes: size of 'fmt ' chunk
+        header[17] = 0;
+        header[18] = 0;
+        header[19] = 0;
+        header[20] = 1; // format = 1
+        header[21] = 0;
+        header[22] = (byte) channels;
+        header[23] = 0;
+        header[24] = (byte) (longSampleRate & 0xff);
+        header[25] = (byte) ((longSampleRate >> 8) & 0xff);
+        header[26] = (byte) ((longSampleRate >> 16) & 0xff);
+        header[27] = (byte) ((longSampleRate >> 24) & 0xff);
+        header[28] = (byte) (byteRate & 0xff);
+        header[29] = (byte) ((byteRate >> 8) & 0xff);
+        header[30] = (byte) ((byteRate >> 16) & 0xff);
+        header[31] = (byte) ((byteRate >> 24) & 0xff);
+        header[32] = (byte) (2 * 16 / 8); // block align
+        header[33] = 0;
+        header[34] = RECORDER_BPP; // bits per sample
+        header[35] = 0;
+        header[36] = 'd';
+        header[37] = 'a';
+        header[38] = 't';
+        header[39] = 'a';
+        header[40] = (byte) (totalAudioLen & 0xff);
+        header[41] = (byte) ((totalAudioLen >> 8) & 0xff);
+        header[42] = (byte) ((totalAudioLen >> 16) & 0xff);
+        header[43] = (byte) ((totalAudioLen >> 24) & 0xff);
+
+        out.write(header, 0, 44);
+    }
 
     private void jsonParse() {
         String url = main_url + "/text/category/" + mCatId + "/random";
+        mTextView.setText("");
+        circleBar.setVisibility(View.VISIBLE);
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
@@ -152,6 +472,8 @@ public class RecordFragment extends Fragment {
                     mText = jsonObject.getString("text");
                     mId = jsonObject.getString("id");
                     mTextView.setText(mText);
+                    circleBar.setVisibility(View.INVISIBLE);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -238,9 +560,75 @@ public class RecordFragment extends Fragment {
                 return headers;
             }
         };
-
         mQueue.add(request);
-
     }
 
+
+
+    private void uploadVoice(final String voicePath) {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpClient client = new OkHttpClient();
+                String url = main_url + "/upload/voice" + "/" + mId;
+                File file = new File(voicePath);
+                Log.d("Upload --","File name: " + file.getName());
+
+                RequestBody file_body = RequestBody.create(MediaType.parse("data"),file);
+                RequestBody body = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("data", file.getName(), file_body)
+                        .build();
+                Log.d("Upload --", file.getName());
+                Log.d("Upload --","Request body generated");
+                okhttp3.Request request = new okhttp3.Request.Builder()
+                        .url(url)
+                        .addHeader("Authorization-Key", "812f2448624c42899fbf794f54f591f9")
+                        .addHeader( "Authorization", "Bearer " + mToken)
+                        .post(body)
+                        .build();
+                try {
+                    String code = "";
+                    okhttp3.Response response = client.newCall(request).execute();
+                    try {
+                        String jsonData = response.body().string();
+                        JSONObject jsonObject = new JSONObject(jsonData);
+                        code = jsonObject.getString("code");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    if (code.equals("200")) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getActivity().getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        Log.d("Upload --","Successful ");
+                    } else {
+                        getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity().getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                        Log.d("Upload --", "Fail");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    private void disableButton() {
+        btnGetText.setEnabled(true);
+        btnStartRecord.setEnabled(false);
+        btnStartRecord.setBackgroundResource(R.drawable.record_shape_disable);
+        btnPlay.setEnabled(false);
+        btnPlay.setBackgroundResource(R.drawable.play_retry_disable);
+        btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
+        btnRetry.setEnabled(false);
+    }
 }
