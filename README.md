@@ -4,7 +4,7 @@
   + Vote a voice is good or bad
   + Edit text of a specific voice if it is not good enough
 
-2- Functions in deverlop progress
+2- Functions in proess of deverlopment
   + Create account
   + Login
  
