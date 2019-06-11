@@ -20,6 +20,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewParent;
@@ -75,7 +76,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         deleteFolder();
+
         Login();
+
     }
 
     public void setActionBarTitle(String title) {
@@ -164,6 +167,28 @@ public class MainActivity extends AppCompatActivity {
         int record_audio_result = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
         int internet_result = ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET);
         return write_exteral_storage_result == PackageManager.PERMISSION_GRANTED && record_audio_result == PackageManager.PERMISSION_GRANTED && internet_result == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.aciton_bar_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.login:
+                LoginOnWeb();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void LoginOnWeb() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 
     @Override

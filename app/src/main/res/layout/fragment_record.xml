@@ -31,19 +31,12 @@
             android:layout_gravity="center"/>
     </FrameLayout>
 
-
-    <Spinner
-        android:id="@+id/spnCategory"
+    <Button
+        android:text="Choose one category"
+        android:id="@+id/btn_dialog"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50px"
-        android:layout_marginLeft="30px"
-        android:layout_marginRight="30px"
-        android:background="#f3f3f3"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:padding="5dip">
-    </Spinner>
+        android:layout_height="wrap_content" />
+
 
     <Button
         android:layout_marginTop="30px"

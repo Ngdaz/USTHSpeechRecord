@@ -1,8 +1,10 @@
 package vn.edu.usth.usthspeechrecord;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioFormat;
@@ -61,7 +63,7 @@ public class RecordFragment extends Fragment {
     ImageButton btnRetry;
     StateButton btnStartRecord;
     MediaPlayButton btnPlay;
-    Spinner listCategories;
+    Button btnDialog;
     TextView mTextView;
     String pathSave = "";
     ProgressBar circleBar;
@@ -117,35 +119,37 @@ public class RecordFragment extends Fragment {
                 AudioFormat.CHANNEL_CONFIGURATION_MONO,
                 AudioFormat.ENCODING_PCM_16BIT);
 
-        listCategories = view.findViewById(R.id.spnCategory);
         Category init = new Category("Please choose one category", 0);
         mCategories.add(init);
 
         categoryAdapter = new CategoryAdapter(getActivity().getApplicationContext(), R.layout.categories_item, mCategories);
-
         getCategory();
 
-        listCategories.setAdapter(categoryAdapter);
-        listCategories.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        btnDialog = view.findViewById(R.id.btn_dialog);
+        btnDialog.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position != 0) {
-                    btnGetText.setEnabled(true);
-                    mCatId = mCategories.get(position).getCatNum();
-                } else {
-                    btnGetText.setEnabled(false);
-                    btnStartRecord.setEnabled(false);
-                    btnStartRecord.setBackgroundResource(R.drawable.record_shape_disable);
-                    btnPlay.setEnabled(false);
-                    btnPlay.setBackgroundResource(R.drawable.play_retry_disable);
-                    btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
-                    btnRetry.setEnabled(false);
-                }
-            }
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
 
+
+                builder.setSingleChoiceItems(categoryAdapter, 0, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mCatId = mCategories.get(which).getCatNum();
+                        String strname = mCategories.get(which).getCatName();
+                        btnDialog.setText(strname);
+                        if (which!=0) btnGetText.setEnabled(true);
+                        dialog.dismiss();
+                    }
+                });
+                builder.show();
             }
         });
 
