@@ -212,38 +212,11 @@ public class MainActivity extends AppCompatActivity {
         },REQUEST_PERMISSION_CODE);
     }
     private void Login() {
-        String username = getString(R.string.user_name);
-        String password = getString(R.string.password);
-        String url = main_url + "/user/login" + "/" + username + "/" + password;
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONObject jsonObject = response.getJSONObject("resp");
-                    mToken = jsonObject.getString("token");
-                    setupViewPager(viewPager);
-                    mTabLayout.setupWithViewPager(viewPager);
-                    setupTabIcons();
-                    Log.d("RESP", mToken);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        }){
-            @Override
-            public HashMap<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization-Key", "812f2448624c42899fbf794f54f591f9");
-                headers.put("accept", "application/json");
-                return headers;
-            }
-        };
-        mQueue.add(request);
+        mToken = getIntent().getStringExtra("TOKEN");
+        setupViewPager(viewPager);
+        mTabLayout.setupWithViewPager(viewPager);
+        setupTabIcons();
+//        Log.d("RESP", mToken);
     }
 
     private void deleteFolder() {

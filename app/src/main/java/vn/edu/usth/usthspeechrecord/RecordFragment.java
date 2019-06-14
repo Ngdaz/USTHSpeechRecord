@@ -2,6 +2,7 @@ package vn.edu.usth.usthspeechrecord;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -112,8 +113,8 @@ public class RecordFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_record, container, false);
 
-        mToken = getArguments().getString("TOKEN");
-        Log.d("RESP2", mToken);
+            mToken = getArguments().getString("TOKEN");
+//        Log.d("RESP2", mToken);
 
         bufferSize = AudioRecord.getMinBufferSize(8000,
                 AudioFormat.CHANNEL_CONFIGURATION_MONO,
@@ -200,15 +201,20 @@ public class RecordFragment extends Fragment {
                         btnRetry.setBackgroundResource(R.drawable.play_retry_bg);
                         break;
                     case 2:
-                        uploadVoice(pathSave);
-                        btnStartRecord.setImageResource(R.drawable.ic_mic_black);
+                        if (mToken == "") {
+                            Toast.makeText(getActivity().getApplicationContext(), "You need to login before upload voice", Toast.LENGTH_SHORT).show();
+                            break;
+                        } else {
+                            uploadVoice(pathSave);
+                            btnStartRecord.setImageResource(R.drawable.ic_mic_black);
 
-                        btnRetry.setEnabled(false);
-                        btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
+                            btnRetry.setEnabled(false);
+                            btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
 
-                        btnPlay.setEnabled(false);
-                        btnPlay.setBackgroundResource(R.drawable.play_retry_disable);
-                        break;
+                            btnPlay.setEnabled(false);
+                            btnPlay.setBackgroundResource(R.drawable.play_retry_disable);
+                            break;
+                        }
                 }
                 btnStartRecord.changeState();
             }
@@ -535,39 +541,6 @@ public class RecordFragment extends Fragment {
         };
         mQueue.add(request);
     }
-
-    private void Login() {
-        String username = getString(R.string.user_name);
-        String password = getString(R.string.password);
-        String url = main_url + "/user/login" + "/" + username + "/" + password;
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONObject jsonObject = response.getJSONObject("resp");
-                    mToken = jsonObject.getString("token");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        }){
-            @Override
-            public HashMap<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization-Key", "812f2448624c42899fbf794f54f591f9");
-                headers.put("accept", "application/json");
-                return headers;
-            }
-        };
-        mQueue.add(request);
-    }
-
-
 
     private void uploadVoice(final String voicePath) {
         Thread t = new Thread(new Runnable() {
