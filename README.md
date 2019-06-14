@@ -3,7 +3,7 @@
   + Record voice and upload voice to server.
   + Vote a voice is good or bad
   + Edit text of a specific voice if it is not good enough
-  + Login (n
+  + Login 
 
 2- Functions in proess of deverlopment
   + Create account
