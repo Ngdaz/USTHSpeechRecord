@@ -72,7 +72,8 @@ public class RecordFragment extends Fragment {
     MediaPlayer mMediaPlayer;
     String mText = "";
     String mId = "";
-    String mToken = "";
+    String mToken = null;
+    Boolean checkToken = false;
     int mCatId = 0;
     ArrayList<Category> mCategories = new ArrayList<Category>();
     CategoryAdapter categoryAdapter;
@@ -114,6 +115,11 @@ public class RecordFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_record, container, false);
 
             mToken = getArguments().getString("TOKEN");
+            if (mToken!=null) {
+                checkToken = true;
+            } else {
+                checkToken = false;
+            }
 //        Log.d("RESP2", mToken);
 
         bufferSize = AudioRecord.getMinBufferSize(8000,
@@ -187,6 +193,7 @@ public class RecordFragment extends Fragment {
 
                         btnRetry.setEnabled(false);
                         btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
+                        btnStartRecord.changeState();
                         break;
                     case 1:
                         stopRecording();
@@ -199,24 +206,25 @@ public class RecordFragment extends Fragment {
 
                         btnRetry.setEnabled(true);
                         btnRetry.setBackgroundResource(R.drawable.play_retry_bg);
+                        btnStartRecord.changeState();
+                        if (!checkToken) {
+                            btnStartRecord.setEnabled(false);
+                            btnStartRecord.setBackgroundResource(R.drawable.record_shape_disable);
+                            Toast.makeText(getActivity().getApplicationContext(), "You need to login before upload voice", Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 2:
-                        if (mToken == "") {
-                            Toast.makeText(getActivity().getApplicationContext(), "You need to login before upload voice", Toast.LENGTH_SHORT).show();
-                            break;
-                        } else {
-                            uploadVoice(pathSave);
-                            btnStartRecord.setImageResource(R.drawable.ic_mic_black);
+                        uploadVoice(pathSave);
+                        btnStartRecord.setImageResource(R.drawable.ic_mic_black);
 
-                            btnRetry.setEnabled(false);
-                            btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
+                        btnRetry.setEnabled(false);
+                        btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
 
-                            btnPlay.setEnabled(false);
-                            btnPlay.setBackgroundResource(R.drawable.play_retry_disable);
-                            break;
-                        }
+                        btnPlay.setEnabled(false);
+                        btnPlay.setBackgroundResource(R.drawable.play_retry_disable);
+                        btnStartRecord.changeState();
+                        break;
                 }
-                btnStartRecord.changeState();
             }
         });
 
