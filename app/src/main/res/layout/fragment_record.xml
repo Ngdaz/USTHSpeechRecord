@@ -31,12 +31,27 @@
             android:layout_gravity="center"/>
     </FrameLayout>
 
-    <Button
-        android:text="Choose one category"
-        android:id="@+id/btn_dialog"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    <!--<Button-->
+        <!--android:text="Choose one category"-->
+        <!--android:id="@+id/btn_dialog"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content" />-->
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#C7C7C7"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp">
+        <Spinner
+            android:id="@+id/btn_dialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:spinnerMode="dialog">
+        </Spinner>
+    </RelativeLayout>
 
     <Button
         android:layout_marginTop="30px"
@@ -44,7 +59,7 @@
         android:id="@+id/btn_get_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Get text"
+        android:text="Tải văn bản"
         android:layout_gravity="center"/>
 
     <LinearLayout

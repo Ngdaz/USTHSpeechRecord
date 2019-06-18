@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
+import android.text.method.Touch;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,7 +65,7 @@ public class RecordFragment extends Fragment {
     ImageButton btnRetry;
     StateButton btnStartRecord;
     MediaPlayButton btnPlay;
-    Button btnDialog;
+    Spinner btnDialog;
     TextView mTextView;
     String pathSave = "";
     ProgressBar circleBar;
@@ -126,39 +127,59 @@ public class RecordFragment extends Fragment {
                 AudioFormat.CHANNEL_CONFIGURATION_MONO,
                 AudioFormat.ENCODING_PCM_16BIT);
 
-        Category init = new Category("Please choose one category", 0);
-        mCategories.add(init);
+//        Category init = new Category("Please choose one category", 0);
+//        mCategories.add(init);
 
         categoryAdapter = new CategoryAdapter(getActivity().getApplicationContext(), R.layout.categories_item, mCategories);
         getCategory();
 
         btnDialog = view.findViewById(R.id.btn_dialog);
-        btnDialog.setOnClickListener(new View.OnClickListener() {
+//        btnDialog.setOnItemClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                    }
+//                });
+//
+//
+//
+//                builder.setSingleChoiceItems(categoryAdapter, 0, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        mCatId = mCategories.get(which).getCatNum();
+//                        String strname = mCategories.get(which).getCatName();
+////                        btnDialog.setText(strname);
+//                        if (which!=0) btnGetText.setEnabled(true);
+//                        dialog.dismiss();
+//                    }
+//                });
+//                builder.show();
+//            }
+//        });
+        btnDialog.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mCatId = mCategories.get(position).getCatNum();
+                Log.d("cat1:", mCategories.get(position).getCatName());
+                jsonParse();
+                btnStartRecord.setEnabled(true);
+                btnStartRecord.setBackgroundResource(R.drawable.recordshape);
+            }
 
-
-
-                builder.setSingleChoiceItems(categoryAdapter, 0, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mCatId = mCategories.get(which).getCatNum();
-                        String strname = mCategories.get(which).getCatName();
-                        btnDialog.setText(strname);
-                        if (which!=0) btnGetText.setEnabled(true);
-                        dialog.dismiss();
-                    }
-                });
-                builder.show();
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+//                mCatId = mCategories.get(0).getCatNum();
+//                Log.d("cat: ", mCategories.get(0).getCatName());
+//                jsonParse();
+//                btnStartRecord.setEnabled(true);
+//                btnStartRecord.setBackgroundResource(R.drawable.recordshape);
             }
         });
+        btnDialog.setAdapter(categoryAdapter);
 
         mTextView = view.findViewById(R.id.get_text);
         mTextView.setMovementMethod(new ScrollingMovementMethod());
@@ -260,11 +281,13 @@ public class RecordFragment extends Fragment {
                             mMediaPlayer.stop();
                             mMediaPlayer.release();
                         }
+                        Toast.makeText(getActivity().getApplicationContext(), "Stopped", Toast.LENGTH_SHORT).show();
                         btnPlay.setImageResource(R.drawable.ic_play);
 
-                        btnStartRecord.setEnabled(true);
-                        btnStartRecord.setBackgroundResource(R.drawable.recordshape);
-
+                        if (mToken!=null) {
+                            btnStartRecord.setEnabled(true);
+                            btnStartRecord.setBackgroundResource(R.drawable.recordshape);
+                        }
                         btnGetText.setEnabled(true);
 
                         btnRetry.setEnabled(true);
@@ -279,6 +302,7 @@ public class RecordFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 btnStartRecord.changeState();
+                btnStartRecord.setEnabled(true);
                 btnStartRecord.setImageResource(R.drawable.ic_mic_black);
                 btnStartRecord.setBackgroundResource(R.drawable.recordshape);
                 btnRetry.setEnabled(false);

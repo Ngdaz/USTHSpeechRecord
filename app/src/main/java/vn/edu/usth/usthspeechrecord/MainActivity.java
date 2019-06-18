@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.container);
         mQueue = VolleySingleton.getInstance(getApplicationContext()).getRequestQueue();
 
-        getSupportActionBar().setTitle("Record");
+        getSupportActionBar().setTitle("USTHSpeechRecord");
 
         if (!checkPermissionFromDevice()) {
             requestPermission();
@@ -87,9 +87,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(RecordFragment.newInstance(mToken), "Record");
-        adapter.addFragment(VoteFragment.newInstance(mToken), "Vote");
-        adapter.addFragment(EditFragment.newInstance(mToken), "Edit");
+        adapter.addFragment(RecordFragment.newInstance(mToken), "Ghi âm");
+        adapter.addFragment(VoteFragment.newInstance(mToken), "Bình chọn");
+        adapter.addFragment(EditFragment.newInstance(mToken), "Chỉnh sửa");
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(3);
 
@@ -103,13 +103,13 @@ public class MainActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 switch (position) {
                     case 0:
-                        getSupportActionBar().setTitle("Record");
+//                        getSupportActionBar().setTitle("Record");
                         break;
                     case 1:
-                        getSupportActionBar().setTitle("Vote");
+//                        getSupportActionBar().setTitle("Vote");
                         break;
                     case 2:
-                        getSupportActionBar().setTitle("Edit");
+//                        getSupportActionBar().setTitle("Edit");
                         break;
                 }
             }
@@ -180,7 +180,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.login:
-                LoginOnWeb();
+                if (mToken!=null){
+                    Toast.makeText(this, "You logged in", Toast.LENGTH_SHORT).show();
+                }else {
+                    LoginOnWeb();
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -216,7 +220,6 @@ public class MainActivity extends AppCompatActivity {
         setupViewPager(viewPager);
         mTabLayout.setupWithViewPager(viewPager);
         setupTabIcons();
-//        Log.d("RESP", mToken);
     }
 
     private void deleteFolder() {

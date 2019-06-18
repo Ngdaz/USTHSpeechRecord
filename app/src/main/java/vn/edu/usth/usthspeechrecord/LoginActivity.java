@@ -17,6 +17,7 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
                     intent.putExtra("TOKEN", token);
                     Log.d("token", token);
                     startActivity(intent);
+                    Toast.makeText(getApplication().getApplicationContext(), "Login successfully", Toast.LENGTH_SHORT).show();
                 }
                 return false;
             }
