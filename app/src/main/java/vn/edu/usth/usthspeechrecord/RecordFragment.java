@@ -209,7 +209,7 @@ public class RecordFragment extends Fragment {
                     case 0:
                         pathSave = getFilename();
                         startRecording();
-                        Toast.makeText(getActivity().getApplicationContext(), "Recording...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getApplicationContext(), "Đang ghi âm...", Toast.LENGTH_SHORT).show();
                         btnStartRecord.setImageResource(R.drawable.ic_mic_off_black_24dp);
 
                         btnRetry.setEnabled(false);
@@ -218,7 +218,7 @@ public class RecordFragment extends Fragment {
                         break;
                     case 1:
                         stopRecording();
-                        Toast.makeText(getActivity().getApplicationContext(), "Stop recording", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getApplicationContext(), "Ngừng ghi âm", Toast.LENGTH_SHORT).show();
                         btnStartRecord.setImageResource(R.drawable.ic_file_upload_black_24dp);
                         btnGetText.setEnabled(false);
 
@@ -231,7 +231,7 @@ public class RecordFragment extends Fragment {
                         if (!checkToken) {
                             btnStartRecord.setEnabled(false);
                             btnStartRecord.setBackgroundResource(R.drawable.record_shape_disable);
-                            Toast.makeText(getActivity().getApplicationContext(), "You need to login before upload voice", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity().getApplicationContext(), "Bạn cần đăng nhập để tải lên bản ghi âm", Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case 2:
@@ -264,7 +264,7 @@ public class RecordFragment extends Fragment {
                             e.printStackTrace();
                         }
                         mMediaPlayer.start();
-                        Toast.makeText(getActivity().getApplicationContext(), "Playing...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getApplicationContext(), "Đang chạy bản ghi âm...", Toast.LENGTH_SHORT).show();
 
                         btnStartRecord.setEnabled(false);
                         btnStartRecord.setBackgroundResource(R.drawable.record_shape_disable);
@@ -281,7 +281,7 @@ public class RecordFragment extends Fragment {
                             mMediaPlayer.stop();
                             mMediaPlayer.release();
                         }
-                        Toast.makeText(getActivity().getApplicationContext(), "Stopped", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getApplicationContext(), "Đã dừng", Toast.LENGTH_SHORT).show();
                         btnPlay.setImageResource(R.drawable.ic_play);
 
                         if (mToken!=null) {
@@ -610,7 +610,7 @@ public class RecordFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(getActivity().getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity().getApplicationContext(), "Tải lên thành công", Toast.LENGTH_SHORT).show();
                             }
                         });
                         Log.d("Upload --","Successful ");
@@ -618,7 +618,7 @@ public class RecordFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getActivity().getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity().getApplicationContext(), "Tải lên thất bại", Toast.LENGTH_SHORT).show();
                         }
                     });
                         Log.d("Upload --", "Fail");

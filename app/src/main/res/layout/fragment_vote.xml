@@ -79,7 +79,7 @@
         android:layout_above="@+id/btn_circle_play"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="-60dp"
-        android:text="Tải văn bản" />
+        android:text="Lấy văn bản" />
 
 
 </RelativeLayout>

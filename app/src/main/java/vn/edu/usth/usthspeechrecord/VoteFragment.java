@@ -90,7 +90,7 @@ public class VoteFragment extends Fragment {
         circleBar.setVisibility(View.INVISIBLE);
 
         disableButton();
-
+        init();
         btnGet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,7 +98,7 @@ public class VoteFragment extends Fragment {
                 prev_subpath = subpath;
                 getVoiceRef();
                 deleteFile();
-                btnGet.setText("Next");
+                btnGet.setText("Tiếp theo");
                 enableButton();
             }
         });
@@ -122,13 +122,15 @@ public class VoteFragment extends Fragment {
                         }
                         mMediaPlayer.start();
                         btnPlay.setImageResource(R.drawable.ic_pause_black_24dp);
-                        Toast.makeText(getActivity().getApplicationContext(), "Playing...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getApplicationContext(), "Đang chơi bản ghi", Toast.LENGTH_SHORT).show();
                         break;
                     case 1:
                         if (mMediaPlayer != null) {
                             mMediaPlayer.stop();
                             mMediaPlayer.release();
                         }
+                        Toast.makeText(getActivity().getApplicationContext(), "Đã dừng", Toast.LENGTH_SHORT).show();
+
                         btnPlay.setImageResource(R.drawable.ic_play_arrow_black_24dp);
                         break;
                 }
@@ -172,6 +174,10 @@ public class VoteFragment extends Fragment {
         downloadManager.enqueue(request);
     }
 
+    private void init() {
+        getVoiceRef();
+        enableButton();
+    }
 
     private void getVoiceRef() {
         String url = main_url + "/voice/random";
@@ -243,9 +249,9 @@ public class VoteFragment extends Fragment {
                 }
                 Log.d("Code", code);
                 if (code.equals("200")) {
-                    Toast.makeText(getActivity().getApplicationContext(), "Voted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity().getApplicationContext(), "Đã bình chọn", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getActivity().getApplicationContext(), "Vote Failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity().getApplicationContext(), "Bình chọn không thành công", Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {

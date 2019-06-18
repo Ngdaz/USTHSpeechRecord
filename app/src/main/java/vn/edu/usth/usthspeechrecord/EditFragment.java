@@ -84,7 +84,7 @@ public class EditFragment extends Fragment {
         circleBar.setVisibility(View.INVISIBLE);
 
         disableButton();
-
+        init();
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -104,13 +104,15 @@ public class EditFragment extends Fragment {
                         }
                         mMediaPlayer.start();
                         btnPlay.setImageResource(R.drawable.ic_pause_black_24dp);
-                        Toast.makeText(getActivity().getApplicationContext(), "Playing...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getApplicationContext(), "Đang chơi bản ghi âm", Toast.LENGTH_SHORT).show();
                         break;
                     case 1:
                         if (mMediaPlayer != null) {
                             mMediaPlayer.stop();
                             mMediaPlayer.release();
                         }
+                        Toast.makeText(getActivity().getApplicationContext(), "Đã dừng", Toast.LENGTH_SHORT).show();
+
                         btnPlay.setImageResource(R.drawable.ic_play_arrow_black_24dp);
                         break;
                 }
@@ -135,6 +137,8 @@ public class EditFragment extends Fragment {
             public void onClick(View v) {
                 String text = mEditText.getText().toString();
                 SendEditText(mId, text);
+                Toast.makeText(getActivity().getApplicationContext(), "Đã chỉnh sửa", Toast.LENGTH_SHORT).show();
+
                 deleteFile();
                 getVoiceRef();
             }
@@ -142,6 +146,14 @@ public class EditFragment extends Fragment {
         return view;
     }
 
+    private void init() {
+        if (getFilename()!=null) deleteFile();
+        getVoiceRef();
+        btnPlay.setEnabled(true);
+        btnPlay.setBackgroundResource(R.drawable.recordshape);
+        btnDone.setEnabled(true);
+        btnDone.setBackgroundResource(R.drawable.play_retry_bg);
+    }
 
     private void getVoiceRef() {
         String url = main_url + "/voice/random";

@@ -59,7 +59,7 @@
         android:id="@+id/btn_get_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tải văn bản"
+        android:text="Lấy văn bản"
         android:layout_gravity="center"/>
 
     <LinearLayout
