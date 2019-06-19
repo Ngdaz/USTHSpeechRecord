@@ -5,7 +5,7 @@
   + Edit text of a specific voice if it is not good enough
   + Login 
 
-2- Functions in proess of deverlopment
+2- Functions in progress of deverlopment
   + Create account
   
  
