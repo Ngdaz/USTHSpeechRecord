@@ -7,4 +7,49 @@
     <string name="title_record">Record</string>
     <string name="title_vote">Vote</string>
     <string name="title_edit">Edit</string>
+<!--    <string name="get_the_text">Lấy văn bản</string>-->
+    <string name="get_the_text">Get the text</string>
+<!--    <string name="log_in">Đăng nhập</string>-->
+    <string name="log_in">Log In</string>
+<!--    <string name="sound_recording">Ghi âm</string>-->
+    <string name="sound_recording">Sound recording</string>
+<!--    <string name="voted">Bình chọn</string>-->
+    <string name="voted">Voted</string>
+<!--    <string name="edit">Chỉnh sửa</string>-->
+    <string name="edit">Edit</string>
+<!--    <string name="playing_the_audio">Đang chơi bản ghi âm</string>-->
+    <string name="playing_the_audio">Playing the audio recording</string>
+<!--    <string name="has_stopped">Đã dừng</string>-->
+    <string name="has_stopped">Has Stopped</string>
+<!--    <string name="already_edited">Đã chỉnh sửa</string>-->
+    <string name="already_edited">Already edited</string>
+<!--    <string name="recording_now">Đang ghi âm...</string>-->
+    <string name="recording_now">Recording now ....</string>
+<!--    <string name="stop_recording">Ngừng ghi âm</string>-->
+    <string name="stop_recording">Stop recording</string>
+<!--    <string name="need_to_be_looged_in">Bạn cần đăng nhập để tải lên bản ghi âm</string>-->
+    <string name="need_to_be_looged_in">You need to be logged in to upload a sound recording</string>
+<!--    <string name="running_audio_recording">Đang chạy bản ghi âm...</string>-->
+    <string name="running_audio_recording">Running audio recording ...</string>
+<!--    <string name="upload_successfull">Tải lên thành công</string>-->
+    <string name="upload_successfull">Upload successful</string>
+<!--    <string name="upload_failed">Tải lên thất bại</string>-->
+    <string name="upload_failed">Upload failed</string>
+<!--    <string name="next">Tiếp theo</string>-->
+    <string name="next">Next</string>
+<!--    <string name="playing_record">Đang chơi bản ghi</string>-->
+    <string name="playing_record">Playing the record</string>
+<!--    <string name="voting_failed">Bình chọn không thành công</string>-->
+    <string name="voting_failed">Voting failed</string>
+    <string name="main_category">Main Category</string>
+    <string name="sub_category">Sub Category</string>
+    <string name="divider">divider</string>
+    <string name="dummy">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Ex Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+
+    <string-array name="categorySpinner">
+        <item>Category one</item>
+        <item>Category two</item>
+        <item>Category three</item>
+        <item>Category four</item>
+    </string-array>
 </resources>

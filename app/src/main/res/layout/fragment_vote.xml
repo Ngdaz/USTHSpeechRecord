@@ -3,30 +3,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".VoteFragment"
-    android:background="#ebebeb">
+    tools:context=".fragments.VoteFragment"
+    android:paddingBottom="80dp"
+    android:padding="8dp"
+    android:background="@drawable/whitebackgroundcard">
 
 
    <FrameLayout
        android:id="@+id/vote_text_container"
        android:layout_width="match_parent"
-       android:layout_height="wrap_content">
+       android:layout_height="200dp">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content">
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/voteTextview"
+                android:padding="40dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="#000"
+                android:scrollbars="vertical"
+                android:gravity="center"
+                android:outlineAmbientShadowColor="#000"
+                android:shadowDx="5"
+                android:shadowDy="5"
+                android:shadowRadius="5"
+                android:background="#f3f3f3"  />
 
-       <TextView
-           android:id="@+id/voteTextview"
-           android:padding="40px"
-           android:layout_width="match_parent"
-           android:layout_height="900px"
-           android:textSize="50px"
-           android:textColor="#000"
-           android:scrollbars="vertical"
-           android:gravity="center"
-           android:outlineAmbientShadowColor="#000"
-           android:shadowDx="5"
-           android:shadowDy="5"
-           android:shadowRadius="5"
-           android:background="#f3f3f3" />
-
+        </ScrollView>
        <ProgressBar
            android:id="@+id/vote_progress_bar"
            style="?android:attr/progressBarStyle"
@@ -37,7 +43,7 @@
    </FrameLayout>
 
 
-    <vn.edu.usth.usthspeechrecord.MediaButton
+    <vn.edu.usth.usthspeechrecord.views.MediaButton
         android:id="@+id/btn_circle_play"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -45,12 +51,12 @@
         android:layout_centerHorizontal="true"
         android:layout_marginStart="0dp"
         android:layout_marginTop="95dp"
-        android:background="@drawable/shapedrawable"
+        android:background="@drawable/circle_gradient"
         android:padding="9dp"
         android:src="@drawable/ic_play_arrow_black_24dp"
         android:textColor="#fff" />
 
-    <ImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/btn_like"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -61,7 +67,7 @@
         android:background="@drawable/shapevotebtn"
         android:src="@drawable/ic_thumb_up_black_24dp" />
 
-    <ImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/btn_dislike"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -72,14 +78,18 @@
         android:background="@drawable/shapevotebtn"
         android:src="@drawable/ic_thumb_down_black_24dp" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_get"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/btn_circle_play"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="-60dp"
-        android:text="Lấy văn bản" />
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:background="@drawable/circle_button_gradient"
+        android:textColor="#ffffff"
+        android:text="@string/get_the_text" />
 
 
 </RelativeLayout>

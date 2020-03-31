@@ -4,5 +4,5 @@
     <item
         android:id="@+id/login"
         app:showAsAction="always"
-        android:title="Đăng nhập"/>
+        android:title="@string/log_in"/>
 </menu>

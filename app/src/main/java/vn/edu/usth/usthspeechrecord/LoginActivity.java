@@ -1,35 +1,30 @@
 package vn.edu.usth.usthspeechrecord;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.http.SslError;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.SslErrorHandler;
-import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Date;
 
 public class LoginActivity extends AppCompatActivity {
 
     WebView mWebView;
     private static final String TAG = "LoginAcivity";
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +40,11 @@ public class LoginActivity extends AppCompatActivity {
         mWebView.clearCache(true);
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                handler.proceed();//ignore
+            }
+
+            @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
                 Log.i("url",url);
@@ -52,6 +52,7 @@ public class LoginActivity extends AppCompatActivity {
                     int begin = url.indexOf("access_token");
                     int end = url.indexOf("&token_type");
                     String token = url.substring(begin+13, end);
+                    Log.e(TAG, "shouldOverrideUrlLoading: Token "+token );
                     Intent intent = new Intent(getBaseContext(), MainActivity.class);
                     intent.putExtra("TOKEN", token);
                     Log.d("token", token);
@@ -59,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(getApplication().getApplicationContext(), "Login successfully", Toast.LENGTH_SHORT).show();
                 }
                 return false;
+
             }
 
         });
@@ -106,20 +108,8 @@ public class LoginActivity extends AppCompatActivity {
     public static void clearCookies(Context context)
     {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            Log.d(TAG, "Using clearCookies code for API >=" + String.valueOf(Build.VERSION_CODES.LOLLIPOP_MR1));
-            CookieManager.getInstance().removeAllCookies(null);
-            CookieManager.getInstance().flush();
-        } else
-        {
-            Log.d(TAG, "Using clearCookies code for API <" + String.valueOf(Build.VERSION_CODES.LOLLIPOP_MR1));
-            CookieSyncManager cookieSyncMngr= CookieSyncManager.createInstance(context);
-            cookieSyncMngr.startSync();
-            CookieManager cookieManager= CookieManager.getInstance();
-            cookieManager.removeAllCookie();
-            cookieManager.removeSessionCookie();
-            cookieSyncMngr.stopSync();
-            cookieSyncMngr.sync();
-        }
+        Log.d(TAG, "Using clearCookies code for API >=" + String.valueOf(Build.VERSION_CODES.LOLLIPOP_MR1));
+        CookieManager.getInstance().removeAllCookies(null);
+        CookieManager.getInstance().flush();
     }
 }

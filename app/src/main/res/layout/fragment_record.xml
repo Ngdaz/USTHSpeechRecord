@@ -1,94 +1,208 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RecordFragment"
-    android:orientation="vertical"
-    android:background="#ebebeb">
+    android:background="@drawable/whitebackgroundcard"
+    android:paddingBottom="80dp"
+    android:padding="8dp"
+    tools:context=".fragments.RecordFragment">
 
-    <FrameLayout
-        android:id="@+id/record_text_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/get_text"
-            android:layout_width="match_parent"
-            android:layout_height="800px"
-            android:background="#f3f3f3"
-            android:gravity="center"
-            android:padding="40px"
-            android:scrollbars="vertical"
-            android:textColor="#000"
-            android:textSize="50px" />
-
-        <ProgressBar
-            android:id="@+id/record_progress_bar"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
-    </FrameLayout>
-
-    <!--<Button-->
-        <!--android:text="Choose one category"-->
-        <!--android:id="@+id/btn_dialog"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content" />-->
-
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#C7C7C7"
-        android:layout_marginRight="5dp"
-        android:layout_marginLeft="5dp">
-        <Spinner
-            android:id="@+id/btn_dialog"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:gravity="center"
-            android:spinnerMode="dialog">
-        </Spinner>
-    </RelativeLayout>
+            android:orientation="vertical">
 
-    <Button
-        android:layout_marginTop="30px"
-        android:layout_marginBottom="50px"
-        android:id="@+id/btn_get_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Lấy văn bản"
-        android:layout_gravity="center"/>
+            <FrameLayout
+                android:id="@+id/record_text_container"
+                android:layout_width="match_parent"
+                android:layout_height="200dp">
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center">
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
 
-        <ImageButton
-            android:id="@+id/btn_retry"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/play_retry_bg"
-            android:layout_marginRight="25dp"
-            android:src="@drawable/ic_retry"/>
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/get_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/dull_whitebackgroundcard"
+                        android:gravity="center"
+                        android:padding="40dp"
+                        android:scrollbars="vertical"
+                        android:textColor="#000000"
+                        android:textSize="18sp" />
+                </ScrollView>
 
-        <vn.edu.usth.usthspeechrecord.StateButton
-            android:id="@+id/btnStartRecord"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/recordshape"
-            android:src="@drawable/ic_mic_black"/>
+                <ProgressBar
+                    android:id="@+id/record_progress_bar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
 
-        <vn.edu.usth.usthspeechrecord.MediaPlayButton
-            android:id="@+id/btnPlayRecord"
-            android:layout_marginLeft="25dp"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@drawable/play_retry_bg"
-            android:src="@drawable/ic_play" />
-    </LinearLayout>
-</LinearLayout>
+            </FrameLayout>
+
+            <!--<Button-->
+            <!--android:text="Choose one category"-->
+            <!--android:id="@+id/btn_dialog"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content" />-->
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:padding="8dp"
+                android:background="@drawable/category_background">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tvMain"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:gravity="center"
+                    android:text="@string/main_category"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"  />
+
+                <Spinner
+                    android:id="@+id/btn_dialog_main"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_toEndOf="@+id/tvMain"
+                    android:gravity="center"
+                    android:spinnerMode="dropdown"
+                    android:textAlignment="center" />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_margin="2dp"
+                    android:layout_alignStart="@+id/btn_dialog_main"
+                    android:layout_alignEnd="@+id/btn_dialog_main"
+                    android:layout_alignBottom="@+id/btn_dialog_main"
+                    android:background="@color/recommended_light"
+                    android:tint="@color/recommended_light" />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/btn_dialog_main"
+                    android:layout_alignEnd="@+id/btn_dialog_main"
+                    android:src="@drawable/ic_arrow_drop_down_black_24dp"
+                    android:tint="@color/recommended_light" />
+                <ImageView
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:background="@color/recommended_light"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_below="@+id/btn_dialog_main"
+
+                    android:contentDescription="@string/divider" />
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tvSub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/divider"
+                    android:layout_margin="8dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center"
+                    android:text="@string/sub_category"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"  />
+
+                <Spinner
+                    android:id="@+id/btn_dialog"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/divider"
+                    android:layout_alignStart="@id/btn_dialog_main"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:outlineAmbientShadowColor="@color/recommended_light"
+                    android:outlineSpotShadowColor="@color/white"
+                    android:dropDownSelector="@color/recommended_light"
+                    android:textAlignment="center" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_margin="2dp"
+                    android:layout_alignStart="@+id/btn_dialog"
+                    android:layout_alignEnd="@+id/btn_dialog"
+                    android:layout_alignBottom="@+id/btn_dialog"
+                    android:background="@color/recommended_light"
+                    android:tint="@color/recommended_light" />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/btn_dialog"
+                    android:layout_alignEnd="@+id/btn_dialog"
+                    android:tint="@color/recommended_light"
+                    android:src="@drawable/ic_arrow_drop_down_black_24dp" />
+            </RelativeLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_get_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="50dp"
+                android:background="@drawable/circle_button_gradient"
+                android:elevation="4dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:shadowColor="#C00BB1"
+                android:text="@string/get_the_text"
+                android:textColor="@color/white" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btn_retry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="25dp"
+                    android:background="@drawable/play_retry_bg"
+                    android:elevation="4dp"
+                    android:src="@drawable/ic_retry" />
+
+                <vn.edu.usth.usthspeechrecord.views.StateButton
+                    android:id="@+id/btnStartRecord"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/circle_gradient"
+                    android:elevation="6dp"
+                    android:src="@drawable/ic_mic_black" />
+
+                <vn.edu.usth.usthspeechrecord.views.MediaPlayButton
+                    android:id="@+id/btnPlayRecord"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="25dp"
+                    android:background="@drawable/play_retry_bg"
+                    android:elevation="4dp"
+                    android:src="@drawable/ic_play" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
