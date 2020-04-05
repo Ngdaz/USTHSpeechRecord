@@ -69,8 +69,9 @@ public class LoginActivity extends AppCompatActivity {
         Double nonce = Math.random();
         String convert  = Long.toString(Double.doubleToLongBits(nonce), 36).substring(7);
 
+        //this is the URL
         String url = "https://eid.itrithuc.vn/auth/realms/eid/protocol/openid-connect/auth?response_type=id_token%20token&redirect_uri=https://voiceviet.itrithuc.vn/eid&scope=openid%20profile%20email%20api&client_id=voiceviet&nonce="+ convert +"kc_locale=vi";
-        mWebView.loadUrl(url);
+        mWebView.loadUrl(url);// its loaded here to the webview(browser) ok
     }
 
     static int clearCacheFolder(final File dir, final int numDays) {

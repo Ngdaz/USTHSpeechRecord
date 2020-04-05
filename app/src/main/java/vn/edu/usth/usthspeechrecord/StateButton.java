@@ -1,8 +1,8 @@
 package vn.edu.usth.usthspeechrecord;
 
 import android.content.Context;
-import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.AppCompatImageButton;
+
+import androidx.appcompat.widget.AppCompatImageButton;
 import android.util.AttributeSet;
 
 

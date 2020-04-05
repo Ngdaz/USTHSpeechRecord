@@ -1,23 +1,13 @@
 package vn.edu.usth.usthspeechrecord;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Application;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
-import android.text.method.Touch;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +17,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,35 +38,49 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
+import vn.edu.usth.usthspeechrecord.adapters.MainCategoryAdapter;
+import vn.edu.usth.usthspeechrecord.models.MainCategory;
+import vn.edu.usth.usthspeechrecord.views.MediaPlayButton;
+import vn.edu.usth.usthspeechrecord.R;
+import vn.edu.usth.usthspeechrecord.views.StateButton;
+import vn.edu.usth.usthspeechrecord.adapters.CategoryAdapter;
+import vn.edu.usth.usthspeechrecord.models.Category;
+import vn.edu.usth.usthspeechrecord.utils.VolleySingleton;
+
+import static android.content.ContentValues.TAG;
 
 
 public class RecordFragment extends Fragment {
     private static final String main_url = "https://voiceviet.itrithuc.vn/api/v1";
 
-    RequestQueue mQueue;
-    Button btnGetText;
-    ImageButton btnRetry;
-    StateButton btnStartRecord;
-    MediaPlayButton btnPlay;
-    Spinner btnDialog;
-    TextView mTextView;
-    String pathSave = "";
-    ProgressBar circleBar;
+    private RequestQueue mQueue;
+    private Button btnGetText;
+    private ImageButton btnRetry;
+    private StateButton btnStartRecord;
+    private MediaPlayButton btnPlay;
+    private Spinner btnDialog,btnMainCategory;
+    private TextView mTextView;
+    private String pathSave = "";
+    private ProgressBar circleBar;
 
-    MediaPlayer mMediaPlayer;
-    String mText = "";
-    String mId = "";
-    String mToken = null;
-    Boolean checkToken = false;
-    int mCatId = 0;
-    ArrayList<Category> mCategories = new ArrayList<Category>();
-    CategoryAdapter categoryAdapter;
+    private MediaPlayer mMediaPlayer;
+    private String mText = "";
+    private String mId = "";
+    private String mToken = null;
+    private Boolean checkToken = false;
+    private int mainCatId = 1;
+    private int mCatId = 0;
+    private ArrayList<Category> mCategories = new ArrayList<>();
+    private ArrayList<MainCategory> mainListCategories = new ArrayList<>();
+    private CategoryAdapter categoryAdapter;
+    private MainCategoryAdapter mainCategoryAdapter;
 
     private static final int RECORDER_BPP = 16;
     private static final String AUDIO_RECORDER_FILE_EXT_WAV = "_audio_record.wav";
@@ -107,7 +110,7 @@ public class RecordFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mQueue = VolleySingleton.getInstance(getActivity().getApplicationContext()).getRequestQueue();
+        mQueue = VolleySingleton.getInstance(getActivity()).getRequestQueue();
     }
 
     @Override
@@ -115,12 +118,12 @@ public class RecordFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_record, container, false);
 
-            mToken = getArguments().getString("TOKEN");
-            if (mToken!=null) {
-                checkToken = true;
-            } else {
-                checkToken = false;
-            }
+        mToken = getArguments().getString("TOKEN");
+        if (mToken!=null) {
+            checkToken = true;
+        } else {
+            checkToken = false;
+        }
 //        Log.d("RESP2", mToken);
 
         bufferSize = AudioRecord.getMinBufferSize(8000,
@@ -130,44 +133,41 @@ public class RecordFragment extends Fragment {
 //        Category init = new Category("Please choose one category", 0);
 //        mCategories.add(init);
 
-        categoryAdapter = new CategoryAdapter(getActivity().getApplicationContext(), R.layout.categories_item, mCategories);
-        getCategory();
+        mainCategoryAdapter = new MainCategoryAdapter(getActivity(), R.layout.categories_item, mainListCategories );
+        categoryAdapter = new CategoryAdapter(getActivity(), R.layout.categories_item, mCategories);
+//        getCategory();
+        getAllCategory();
 
         btnDialog = view.findViewById(R.id.btn_dialog);
-//        btnDialog.setOnItemClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.dismiss();
-//                    }
-//                });
-//
-//
-//
-//                builder.setSingleChoiceItems(categoryAdapter, 0, new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        mCatId = mCategories.get(which).getCatNum();
-//                        String strname = mCategories.get(which).getCatName();
-////                        btnDialog.setText(strname);
-//                        if (which!=0) btnGetText.setEnabled(true);
-//                        dialog.dismiss();
-//                    }
-//                });
-//                builder.show();
-//            }
-//        });
+        btnMainCategory = view.findViewById(R.id.btn_dialog_main);
         btnDialog.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mCatId = mCategories.get(position).getCatNum();
-                Log.d("cat1:", mCategories.get(position).getCatName());
+                Log.d("cat1:", mCatId+mCategories.get(position).getCatName());
                 jsonParse();
                 btnStartRecord.setEnabled(true);
-                btnStartRecord.setBackgroundResource(R.drawable.recordshape);
+                btnStartRecord.setBackgroundResource(R.drawable.circle_gradient);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+//                mCatId = mCategories.get(0).getCatNum();
+//                Log.d("cat: ", mCategories.get(0).getCatName());
+//                jsonParse();
+//                btnStartRecord.setEnabled(true);
+//                btnStartRecord.setBackgroundResource(R.drawable.recordshape);
+            }
+        });
+        btnMainCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mainCatId = mainListCategories.get(position).getCatNum();
+                Log.e(TAG, "onItemSelected: "+mainCatId );
+                Log.d("cat1:", position+mainListCategories.get(position).getName());
+                getCategory();
+                btnStartRecord.setEnabled(true);
+                btnStartRecord.setBackgroundResource(R.drawable.circle_gradient);
             }
 
             @Override
@@ -180,6 +180,7 @@ public class RecordFragment extends Fragment {
             }
         });
         btnDialog.setAdapter(categoryAdapter);
+        btnMainCategory.setAdapter(mainCategoryAdapter);
 
         mTextView = view.findViewById(R.id.get_text);
         mTextView.setMovementMethod(new ScrollingMovementMethod());
@@ -198,7 +199,7 @@ public class RecordFragment extends Fragment {
             public void onClick(View v) {
                 jsonParse();
                 btnStartRecord.setEnabled(true);
-                btnStartRecord.setBackgroundResource(R.drawable.recordshape);
+//                btnStartRecord.setBackgroundResource(R.drawable.recordshape);
             }
         });
 
@@ -209,7 +210,7 @@ public class RecordFragment extends Fragment {
                     case 0:
                         pathSave = getFilename();
                         startRecording();
-                        Toast.makeText(getActivity().getApplicationContext(), "Đang ghi âm...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), getString(R.string.recording_now), Toast.LENGTH_SHORT).show();
                         btnStartRecord.setImageResource(R.drawable.ic_mic_off_black_24dp);
 
                         btnRetry.setEnabled(false);
@@ -218,20 +219,20 @@ public class RecordFragment extends Fragment {
                         break;
                     case 1:
                         stopRecording();
-                        Toast.makeText(getActivity().getApplicationContext(), "Ngừng ghi âm", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), getString(R.string.stop_recording), Toast.LENGTH_SHORT).show();
                         btnStartRecord.setImageResource(R.drawable.ic_file_upload_black_24dp);
                         btnGetText.setEnabled(false);
 
                         btnPlay.setEnabled(true);
-                        btnPlay.setBackgroundResource(R.drawable.play_retry_bg);
+                        btnPlay.setBackgroundResource(R.drawable.circle_gradient);
 
                         btnRetry.setEnabled(true);
                         btnRetry.setBackgroundResource(R.drawable.play_retry_bg);
                         btnStartRecord.changeState();
                         if (!checkToken) {
                             btnStartRecord.setEnabled(false);
-                            btnStartRecord.setBackgroundResource(R.drawable.record_shape_disable);
-                            Toast.makeText(getActivity().getApplicationContext(), "Bạn cần đăng nhập để tải lên bản ghi âm", Toast.LENGTH_SHORT).show();
+//                            btnStartRecord.setBackgroundResource(R.drawable.record_shape_disable);
+                            Toast.makeText(getActivity(), getString(R.string.need_to_be_looged_in), Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case 2:
@@ -242,7 +243,7 @@ public class RecordFragment extends Fragment {
                         btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
 
                         btnPlay.setEnabled(false);
-                        btnPlay.setBackgroundResource(R.drawable.play_retry_disable);
+                        btnPlay.setBackgroundResource(R.drawable.circle_gradient);
                         btnStartRecord.changeState();
                         break;
                 }
@@ -256,6 +257,28 @@ public class RecordFragment extends Fragment {
                 switch (mbp.getState()) {
                     case 0:
                         mMediaPlayer = new MediaPlayer();
+                        //add audio player Listener
+                        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mediaPlayer) {
+                                if (mMediaPlayer != null) {
+                                    mMediaPlayer.stop();
+                                    mMediaPlayer.release();
+                                }
+                                Toast.makeText(getActivity(), getString(R.string.has_stopped), Toast.LENGTH_SHORT).show();
+                                btnPlay.setImageResource(R.drawable.ic_play);
+
+                                if (mToken!=null) {
+                                    btnStartRecord.setEnabled(true);
+                                    btnStartRecord.setBackgroundResource(R.drawable.circle_gradient);
+                                }
+                                btnGetText.setEnabled(true);
+
+                                btnRetry.setEnabled(true);
+                                btnRetry.setBackgroundResource(R.drawable.play_retry_bg);
+                                mbp.changeState();
+                            }
+                        });
                         try {
                             Log.d("path", pathSave);
                             mMediaPlayer.setDataSource(pathSave);
@@ -264,10 +287,10 @@ public class RecordFragment extends Fragment {
                             e.printStackTrace();
                         }
                         mMediaPlayer.start();
-                        Toast.makeText(getActivity().getApplicationContext(), "Đang chạy bản ghi âm...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), getString(R.string.running_audio_recording), Toast.LENGTH_SHORT).show();
 
                         btnStartRecord.setEnabled(false);
-                        btnStartRecord.setBackgroundResource(R.drawable.record_shape_disable);
+                        btnStartRecord.setBackgroundResource(R.drawable.circle_gradient);
 
                         btnRetry.setEnabled(false);
                         btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
@@ -275,26 +298,27 @@ public class RecordFragment extends Fragment {
                         btnGetText.setEnabled(false);
 
                         btnPlay.setImageResource(R.drawable.ic_pause);
+                        mbp.changeState();
                         break;
                     case 1:
                         if (mMediaPlayer != null) {
                             mMediaPlayer.stop();
                             mMediaPlayer.release();
                         }
-                        Toast.makeText(getActivity().getApplicationContext(), "Đã dừng", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), getString(R.string.has_stopped), Toast.LENGTH_SHORT).show();
                         btnPlay.setImageResource(R.drawable.ic_play);
 
                         if (mToken!=null) {
                             btnStartRecord.setEnabled(true);
-                            btnStartRecord.setBackgroundResource(R.drawable.recordshape);
+                            btnStartRecord.setBackgroundResource(R.drawable.circle_gradient);
                         }
                         btnGetText.setEnabled(true);
 
                         btnRetry.setEnabled(true);
                         btnRetry.setBackgroundResource(R.drawable.play_retry_bg);
+                        mbp.changeState();
                         break;
                 }
-                mbp.changeState();
             }
         });
 
@@ -304,11 +328,11 @@ public class RecordFragment extends Fragment {
                 btnStartRecord.changeState();
                 btnStartRecord.setEnabled(true);
                 btnStartRecord.setImageResource(R.drawable.ic_mic_black);
-                btnStartRecord.setBackgroundResource(R.drawable.recordshape);
+                btnStartRecord.setBackgroundResource(R.drawable.circle_gradient);
                 btnRetry.setEnabled(false);
                 btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
                 btnPlay.setEnabled(false);
-                btnPlay.setBackgroundResource(R.drawable.play_retry_disable);
+                btnPlay.setBackgroundResource(R.drawable.circle_gradient);
             }
         });
 
@@ -503,12 +527,14 @@ public class RecordFragment extends Fragment {
 
     private void jsonParse() {
         String url = main_url + "/text/category/" + mCatId + "/random";
+        Log.e(TAG, "jsonParse: "+url );
         mTextView.setText("");
         circleBar.setVisibility(View.VISIBLE);
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
+                Log.e(TAG, "onResponse: "+response.toString() );
                 try {
                     JSONObject jsonObject = response.getJSONObject("resp");
                     mText = jsonObject.getString("text");
@@ -524,6 +550,8 @@ public class RecordFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+                Log.e(TAG, "onErrorResponse: "+url );
+                Toast.makeText(getActivity(), "An error occured while sending request", Toast.LENGTH_SHORT).show();
             }
         }) {
             @Override
@@ -538,21 +566,106 @@ public class RecordFragment extends Fragment {
     }
 
     private void getCategory() {
-        String url = main_url + "/domain/8";
+        mCategories=new ArrayList<>();
+
+        if (mainListCategories.size()>0){
+            List<Category> mainCategory =getCurrentSubcategories();
+            if (mainCategory.size()>0){
+                for (int i = 0; i< mainCategory.size(); i++){
+                    mCategories.add(mainCategory.get(i));
+                    Log.e(TAG, "getSubCategory: name: "+mainCategory.get(i).getCatNum()+" "+mainCategory.get(i).getCatName() );
+                    categoryAdapter.setArrayList(mCategories);
+                    categoryAdapter.notifyDataSetChanged();
+                    mCatId=1;
+                }
+                jsonParse();
+            }
+        }
+//        Log.e(TAG, "getCategory: " );
+//        String url = main_url + "/domain/"+mainCatId;
+//        Log.e(TAG, "getCategory: "+url );
+//
+//        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+//            @Override
+//            public void onResponse(JSONObject response) {
+//                Log.e(TAG, "onResponse: getCategory "+url );
+//                Log.e(TAG, "onResponse: getCategory Response "+response.toString() );
+//                try {
+//                    JSONArray categories = response.getJSONArray("resp").getJSONObject(0).getJSONArray("categories");
+//                    for (int i=0; i < categories.length(); i++) {
+//                        JSONObject cate = categories.getJSONObject(i);
+//                        String catName = cate.getString("name");
+//                        String id = cate.getString("id");
+//                        Category newCat = new Category(catName, Integer.valueOf(id));
+//                        mCategories.add(newCat);
+//                        categoryAdapter.notifyDataSetChanged();
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                error.printStackTrace();
+//                Log.e(TAG, "onResponseError: getCategory "+error.getMessage() );
+//                Log.e(TAG, "onResponseError: getCategory "+url );
+//            }
+//        }) {
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                HashMap<String, String> headers = new HashMap<String, String>();
+//                headers.put("Authorization-Key", "812f2448624c42899fbf794f54f591f9");
+//                headers.put("accept", "application/json");
+//                return headers;
+//            }
+//        };
+//        mQueue.add(request);
+    }
+    private List<Category> getCurrentSubcategories(){
+        List<Category> mainCategory =new ArrayList<>();
+        for (int i=0;i<mainListCategories.size();i++){
+            if (mainListCategories.get(i).getCatNum()==mainCatId){
+                mainCategory= mainListCategories.get(i).getCategoryList();
+            }
+        }
+        return mainCategory;
+
+    }
+    private void getAllCategory() {
+        Log.e(TAG, "getAllCategory: " );
+        String url = main_url + "/domain/list/15/1";
+
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
+                Log.e(TAG, "onResponse: getAllCategory "+url );
+                Log.e(TAG, "onResponse: getAllCategory Response "+response.toString() );
                 try {
-                    JSONArray categories = response.getJSONArray("resp").getJSONObject(0).getJSONArray("categories");
-                    for (int i=0; i < categories.length(); i++) {
-                        JSONObject cate = categories.getJSONObject(i);
-                        String catName = cate.getString("name");
+                    JSONArray mainCategories = response.getJSONArray("resp");
+                    for (int i=0; i < mainCategories.length(); i++) {
+                        JSONObject cate = mainCategories.getJSONObject(i);
+                        String catName = cate.getString("domainName");
                         String id = cate.getString("id");
-                        Category newCat = new Category(catName, Integer.valueOf(id));
-                        mCategories.add(newCat);
-                        categoryAdapter.notifyDataSetChanged();
+                        JSONArray categories2 = cate.getJSONArray("categories");
+
+                        mCategories= new ArrayList<>();
+                        for (int i2=0; i2 < categories2.length(); i2++) {
+                            JSONObject cate2 = categories2.getJSONObject(i2);
+                            String catName2 = cate2.getString("name");
+                            String id2 = cate2.getString("id");
+                            String domainId = cate2.getString("domainId");
+                            Category newCat2 = new Category(catName2, domainId, Integer.valueOf(id2));
+                            mCategories.add(newCat2);
+                        }
+                        if (isAccessible(Integer.valueOf(id))){
+                            MainCategory mainCategory=new MainCategory(catName,Integer.valueOf(id),mCategories);
+                            mainListCategories.add(mainCategory);//mainListCategories
+                            mainCategoryAdapter.notifyDataSetChanged();
+                        }
                     }
+                    getCategory();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -561,6 +674,8 @@ public class RecordFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+                Log.e(TAG, "onResponseError: getAllCategory "+error.getMessage() );
+                Log.e(TAG, "onResponseError: getAllCategory "+url );
             }
         }) {
             @Override
@@ -572,6 +687,15 @@ public class RecordFragment extends Fragment {
             }
         };
         mQueue.add(request);
+    }
+    private boolean isAccessible(Integer valueOf) {
+        int[] noAccessible={2,4,5,6,7,12};
+        for (int value : noAccessible) {
+            if (valueOf == value) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void uploadVoice(final String voicePath) {
@@ -610,17 +734,17 @@ public class RecordFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(getActivity().getApplicationContext(), "Tải lên thành công", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), getString(R.string.upload_successfull), Toast.LENGTH_SHORT).show();
                             }
                         });
                         Log.d("Upload --","Successful ");
                     } else {
                         getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getActivity().getApplicationContext(), "Tải lên thất bại", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                            @Override
+                            public void run() {
+                                Toast.makeText(getActivity(), getString(R.string.upload_failed), Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         Log.d("Upload --", "Fail");
                     }
                 } catch (IOException e) {
@@ -634,9 +758,9 @@ public class RecordFragment extends Fragment {
     private void disableButton() {
         btnGetText.setEnabled(true);
         btnStartRecord.setEnabled(false);
-        btnStartRecord.setBackgroundResource(R.drawable.record_shape_disable);
+        btnStartRecord.setBackgroundResource(R.drawable.circle_gradient);
         btnPlay.setEnabled(false);
-        btnPlay.setBackgroundResource(R.drawable.play_retry_disable);
+        btnPlay.setBackgroundResource(R.drawable.circle_gradient);
         btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
         btnRetry.setEnabled(false);
     }
