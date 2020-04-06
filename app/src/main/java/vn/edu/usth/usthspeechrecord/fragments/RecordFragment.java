@@ -290,7 +290,7 @@ public class RecordFragment extends Fragment {
                         Toast.makeText(getActivity(), getString(R.string.running_audio_recording), Toast.LENGTH_SHORT).show();
 
                         btnStartRecord.setEnabled(false);
-                        btnStartRecord.setBackgroundResource(R.drawable.circle_gradient);
+                        btnStartRecord.setBackgroundResource(R.drawable.play_retry_disable);
 
                         btnRetry.setEnabled(false);
                         btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
@@ -760,7 +760,7 @@ public class RecordFragment extends Fragment {
         btnStartRecord.setEnabled(false);
         btnStartRecord.setBackgroundResource(R.drawable.circle_gradient);
         btnPlay.setEnabled(false);
-        btnPlay.setBackgroundResource(R.drawable.circle_gradient);
+        btnPlay.setBackgroundResource(R.drawable.play_retry_disable);
         btnRetry.setBackgroundResource(R.drawable.play_retry_disable);
         btnRetry.setEnabled(false);
     }
